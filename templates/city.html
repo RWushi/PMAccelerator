@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather forecast</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .search-method {
+            margin-bottom: 15px;
+        }
+        .search-method label {
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .search-input {
+            display: none;
+            margin-top: 10px;
+        }
+        .active {
+            display: block;
+        }
+        #suggestions {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Alisher Issin- AI/ML Engineer Intern</h1>
+<a href="https://www.linkedin.com/company/pmaccelerator/"  target="_blank" rel="noopener noreferrer">
+    <button>Info</button>
+</a>
+<a href="https://drive.google.com/file/d/1hMNpjGs4Y5gIpp_tuhmdVDxZFU_RLzsX/view?usp=drive_link"  target="_blank" rel="noopener noreferrer">
+    <button>Plz pay attention for my Cover Letter</button>
+<a href="http://localhost:5000/about_me"  target="_blank" rel="noopener noreferrer">
+    <button>More info about me</button>
+</a>
+<form method="post" autocomplete="off">
+    <div class="search-method">
+        <label>
+            <input type="radio" name="search_type" value="city" checked onchange="toggleSearchInput()"> By the city
+        </label>
+        <label>
+            <input type="radio" name="search_type" value="coordinates" onchange="toggleSearchInput()"> By coordinates
+        </label>
+        <label>
+            <input type="radio" name="search_type" value="zip" onchange="toggleSearchInput()"> By postal code
+        </label>
+    </div>
+
+    <div id="city-input" class="search-input active">
+        <label for="city">Enter city name:</label>
+        <input type="text" id="city" name="city" value="{{ last_city if last_city else '' }}" autocomplete="off" oninput="fetchSuggestions()">
+        <div id="suggestions"></div>
+    </div>
+
+    <div id="coordinates-input" class="search-input">
+        <label for="lat">Latitude:</label>
+        <input type="text" id="lat" name="lat" placeholder="For example: 55.7558">
+        <label for="lon">Longitude:</label>
+        <input type="text" id="lon" name="lon" placeholder="For example: 37.6173">
+    </div>
+
+    <div id="zip-input" class="search-input">
+        <label for="zip">Postal code:</label>
+        <input type="text" id="zip" name="zip" placeholder="For example: 101000">
+        <label for="country">Country (code):</label>
+        <input type="text" id="country" name="country" placeholder="For example: RU" maxlength="2">
+    </div>
+
+    <label>
+    <button type="button" onclick="autoDetectLocation()">Autodetection</button>
+    </label>
+
+    <input type="submit" value="Get the weather">
+</form>
+
+{% if last_city %}
+    <p style="font-size: 20px;">Last viewed city: {{ last_city }}</p>
+{% endif %}
+
+<script src="{{ url_for('static', filename='suggestions.js') }}"></script>
+<script>
+    function toggleSearchInput() {
+        document.querySelectorAll('.search-input').forEach(el => {
+            el.classList.remove('active');
+        });
+
+        const selectedMethod = document.querySelector('input[name="search_type"]:checked').value;
+        document.getElementById(`${selectedMethod}-input`).classList.add('active');
+    }
+
+    function autoDetectLocation() {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude.toFixed(6);
+                const lon = position.coords.longitude.toFixed(6);
+
+                document.querySelector('input[name="search_type"][value="coordinates"]').checked = true;
+                toggleSearchInput(); // updating the visibility of blocks
+
+                document.getElementById("lat").value = lat;
+                document.getElementById("lon").value = lon;
+            },
+            function(error) {
+                alert("Failed to get location: " + getGeoLocationError(error.code));
+            }
+        );
+    }
+
+    function getGeoLocationError(code) {
+        switch(code) {
+            case 1:
+                return "Access to geolocation is denied by the user";
+            case 2:
+                return "Unable to determine location";
+            case 3:
+                return "Timed out";
+            default:
+                return "Unknown error";
+        }
+    }
+</script>
+</body>
+</html>

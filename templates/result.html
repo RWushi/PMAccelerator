@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather forecast</title>
+    <style>
+        .large-text {
+            font-size: 1.5em;
+        }
+        h1 {
+            font-size: 3em;
+        }
+        .day {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+        .back-button {
+            background-color: rgba(255, 255, 255, 0);
+            color: #000;
+            border: 2px solid #fc9a40;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 0;
+            text-transform: uppercase;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather in the city {{ city }}</h1>
+
+    {% if weather and weather.time %}
+        {% for i in range(5) if i < weather.time|length %}
+            <div class="day">
+                <h2>{{ weather.time[i] }}</h2>
+                <p>🌡️ Temperature: {{ weather.temperature_2m_min[i] }}°C — {{ weather.temperature_2m_max[i] }}°C</p>
+                <p>🌧 Chance of precipitation: {{ weather.precipitation_probability_max[i] }}%</p>
+                <p>💧 Humidity: {{ weather.relative_humidity_2m_max[i] }}%</p>
+                <p>🌬 Wind speed: {{ weather.wind_speed_10m_max[i] }} км/ч</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="large-text">Failed to load weather forecast.</p>
+    {% endif %}
+
+    <form action="/" method="get">
+        <button type="submit" class="back-button">Back</button>
+    </form>
+</body>
+</html>
